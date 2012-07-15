@@ -29,6 +29,7 @@ while (@ARGV) {
     if ( -f $tmpfile ) {
         sleep int(rand 10);
     } else {
+		# エンコードするファイルを表示
         warn @ARGV,"\n";
         print "open\n";
         open(F, "> $tmpfile") or next;
