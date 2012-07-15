@@ -5,7 +5,7 @@
 ################################################
 
 my $workdir = "${0}_work";         # 作業ディレクトリ
-my $pfile = "$tmpdir/running.pid"; # 重複でプロセスが動かないように。
+my $pfile = "$workdir/running.pid"; # 重複でプロセスが動かないように。
 my $rundum_time = 10;              # ランダムの最大時間 -1秒
 my $encode_soft_path = 'C:"Program Files (x86)"\\Handbrake\\HandBrakeCLI.exe';
 
@@ -26,23 +26,23 @@ unless ( -d $workdir ) {
 # 複数ファイルを引数にした場合順番に処理
 warn @ARGV,"\n";
 while (@ARGV) {
-    if ( -f $tmpfile ) {
+    if ( -f $pfile ) {
         sleep int(rand 10);
     } else {
 		# エンコードするファイルを表示
         warn @ARGV,"\n";
         print "open\n";
-        open(F, "> $tmpfile") or next;
-        flock(F, LOCK_EX) or next;
+        open(F, "> $pfile") or next;
+        flock(F, 6) or next;
         print F "$ARGV[0] encode start\n";
         $inputfile = $ARGV[0];
         $outputfile = $ARGV[0];
         $outputfile =~ s/\.ts$/.mp4/g;
         $other_options = "-e x264 --keep-display-aspect --no-dvdnav --cfr";
         system("$encode_soft_path -i \"$inputfile\" -o \"$outputfile\" $other_options");
-        flock(F, LOCK_NB);
+        flock(F, 8);
         close(F);
-        unlink $tmpfile;
+        unlink $pfile;
         shift @ARGV;
     }
 }
